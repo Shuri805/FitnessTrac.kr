@@ -1,6 +1,28 @@
+const { client } = require('./index');
+
+
+
+async function testDB() {
+  try {
+    client.connect();
+    const {rows} = await client.query(`SELECT * FROM users;`);
+    console.log(rows);
+
+  } catch (error) {
+    console.error(error);
+  } finally {
+    client.end();
+  }
+}
+
+testDB();
+
+
+
+
 async function createTables() {
   try {
-    console.log("Starting to build tables...");    
+    console.log("Starting to build tables...");
 
     await client.query(`
             CREATE TABLE users (
@@ -64,17 +86,17 @@ async function createInitialUsers() {
   try {
     console.log("Starting to create users...");
 
-    await createUser({ 
-      username: 'albert', 
+    await createUser({
+      username: 'albert',
       password: 'bertie99',
       name: 'Al Bert',
     });
-    await createUser({ 
-      username: 'sandra', 
+    await createUser({
+      username: 'sandra',
       password: '2sandy4me',
       name: 'Just Sandra',
     });
-    await createUser({ 
+    await createUser({
       username: 'glamgal',
       password: 'soglam',
       name: 'Joshua',

@@ -1,11 +1,12 @@
-const { client, 
-  getAllUsers, 
-  getAllActivities, 
-  getAllRoutines, 
-  createUser, 
-  createActivity, 
-  createRoutine, 
-  updateActivity 
+const { client,
+  getAllUsers,
+  getAllActivities,
+  getAllRoutines,
+  createUser,
+  createActivity,
+  createRoutine,
+  updateActivity,
+  updateRoutine
 } = require('./index');
 
 async function testDB() {
@@ -15,11 +16,19 @@ async function testDB() {
 
     const [activity] = await getAllActivities();
     const updateActivityResult = await updateActivity(activity.id, {
-      name: 'Biking', 
+      name: 'Biking',
       description: 'Ride a bike'
     });
-    console.log('updateActivityResult:', updateActivityResult)
-    
+    console.log('updateActivityResult:', updateActivityResult);
+
+    const [routine] = await getAllRoutines();
+    const updateRoutineResult = await updateRoutine(routine.id, {
+     public: false,
+     name: 'cardio',
+     goal: '30 mins',
+    });
+    console.log('updateRoutineResult', updateRoutineResult)
+
     console.log('finished testing DB');
   } catch (error) {
     console.error(error);

@@ -22,7 +22,7 @@ async function getAllActivities() {
 
 async function getAllRoutines() {
     const { rows } = await client.query(`
-        SELECT is, name
+        SELECT id, name
         FROM routines;
     `);
 
@@ -69,28 +69,50 @@ async function createRoutine({ creatorId, public, name, goal }) {
 };
 
 async function updateActivity(id, fields = {}) {
-    const setString = Object.keys(fields).map(
-        (key, index) => `"${key}"=$${ index + 1 }`
-    ).join(', ');
+  const setString = Object.keys(fields).map(
+      (key, index) => `"${key}"=$${ index + 1 }`
+  ).join(', ');
 
-    if(setString.length === 0) {
-        return;
-    }
+  if(setString.length === 0) {
+      return;
+  }
 
-    try {
-        const { rows: [activity] } = await client.query(`
-            UPDATE activities
-            SET ${setString}
-            WHERE id=${id}
-            RETURNING *;
-        `, Object.values(fields));
+  try {
+      const { rows: [activity] } = await client.query(`
+          UPDATE activities
+          SET ${setString}
+          WHERE id=${id}
+          RETURNING *;
+      `, Object.values(fields));
 
-        return activity;
-    } catch(error) {
-        throw error;
-    }
+      return activity;
+  } catch(error) {
+      throw error;
+  }
 };
 
+async function updateRoutine(id, fields = {}) {
+  const setString = Object.keys(fields).map(
+      (key, index) => `"${key}"=$${ index + 1 }`
+  ).join(', ');
+
+  if(setString.length === 0) {
+      return;
+  }
+
+  try {
+    const {rows: [routine] } = await client.query(`
+      UPDATE routines
+      SET ${setString}
+      WHERE id=${id}
+      RETURNING *;
+      `, Object.values(fields));
+
+      return routine;
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
   client,
@@ -101,4 +123,5 @@ module.exports = {
   createActivity,
   createRoutine,
   updateActivity,
+  updateRoutine,
 }

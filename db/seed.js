@@ -1,24 +1,14 @@
-const { client } = require('./index');
-
-
+const { client, getAllUsers, getAllActivities, getAllRoutines, createUser } = require('./index');
 
 async function testDB() {
   try {
-    client.connect();
-    const {rows} = await client.query(`SELECT * FROM users;`);
-    console.log(rows);
-
+    const users = await getAllUsers();
+    console.log('getAllUsers:', users);
+    console.log('finished testing DB');
   } catch (error) {
     console.error(error);
-  } finally {
-    client.end();
   }
 }
-
-testDB();
-
-
-
 
 async function createTables() {
   try {
@@ -29,18 +19,19 @@ async function createTables() {
               id SERIAL PRIMARY KEY,
               username varchar(255) UNIQUE NOT NULL,
               password varchar(255) NOT NULL,
-              name varchar(255) NOT NULL,
+              name varchar(255) NOT NULL
             );
 
             CREATE TABLE activities (
               id SERIAL PRIMARY KEY,
               name VARCHAR(255) UNIQUE NOT NULL,
-              description TEXT NOT NULL,
+              description TEXT NOT NULL
             );
 
             CREATE TABLE routines (
               id SERIAL PRIMARY KEY,
-              "creatorId" INTEGER FOREIGN KEY,
+              "creatorId" INTEGER, 
+              FOREIGN KEY("creatorId") REFERENCES users(id),
               public BOOLEAN DEFAULT false,
               name VARCHAR(255) UNIQUE NOT NULL,
               goal TEXT NOT NULL
@@ -48,8 +39,10 @@ async function createTables() {
 
             CREATE TABLE routine_activities (
               id SERIAL PRIMARY KEY,
-              "routineId" INTEGER FOREIGN KEY,
-              "activityId" INTEGER FOREIGN KEY,
+              "routineId" INTEGER,
+              FOREIGN KEY("routineId") REFERENCES routines(id),
+              "activityId" INTEGER,
+              FOREIGN KEY("activityId") REFERENCES activities(id),
               duration INTEGER,
               count INTEGER,
               UNIQUE ("routineId", "activityId")
@@ -82,10 +75,22 @@ async function dropTables() {
   }
 };
 
+async function rebuildDB() {
+  try {
+    client.connect();
+
+    await dropTables();
+    await createTables();
+    await createInitialUsers();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 async function createInitialUsers() {
   try {
     console.log("Starting to create users...");
-
+    
     await createUser({
       username: 'albert',
       password: 'bertie99',
@@ -101,10 +106,15 @@ async function createInitialUsers() {
       password: 'soglam',
       name: 'Joshua',
     });
-
+    
     console.log("Finished creating users!");
   } catch (error) {
     console.error("Error creating users!");
     throw error;
   }
 };
+
+rebuildDB()
+  .then(testDB)
+  .catch(console.error)
+  .finally(()=> client.end());

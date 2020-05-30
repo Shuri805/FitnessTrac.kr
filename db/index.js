@@ -29,6 +29,13 @@ async function getAllRoutines() {
     return rows;
 };
 
+// async function getPublicRoutines() {
+//     const { rows } = await client.query(`
+//       SELECT id, name
+//       FROM routines;
+//     `)
+// }
+
 async function createUser({ username, password, name}) {
     try {
         const result = await client.query(`
@@ -113,6 +120,33 @@ async function updateRoutine(id, fields = {}) {
     throw error;
   }
 };
+
+async function createRoutineActivity(routineId, activityId) {
+  try {
+    await client.query(`
+    INSERT INTO routine_activities("routineId", "activityId")
+    VALUES ($1, $2)
+    ON CONFLICT ("routineId", "activityId") DO NOTHING;
+    `,[ routineId, activityId]);
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function addActivitytoRoutine(routineId, activityList){
+  try {
+    const createRoutineActivityPromises = activityList.map(activity=> createRoutineActivity(routineId, activity.id)
+    );
+
+    await Promise.all(createRoutineActivityPromises)
+
+    return await getRoutineById(routineId);
+  } catch (error) {
+
+  }
+}
+
+
 
 module.exports = {
   client,

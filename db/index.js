@@ -14,7 +14,7 @@ async function getAllUsers() {
 async function getAllActivities() {
     const { rows } = await client.query(`
         SELECT id, name
-        FROM actvities;
+        FROM activities;
     `);
 
     return rows;
@@ -68,6 +68,28 @@ async function createRoutine({ creatorId, public, name, goal }) {
   }
 };
 
+async function updateActivity(id, fields = {}) {
+    const setString = Object.keys(fields).map(
+        (key, index) => `"${key}"=$${ index + 1 }`
+    ).join(', ');
+
+    if(setString.length === 0) {
+        return;
+    }
+
+    try {
+        const { rows: [activity] } = await client.query(`
+            UPDATE activities
+            SET ${setString}
+            WHERE id=${id}
+            RETURNING *;
+        `, Object.values(fields));
+
+        return activity;
+    } catch(error) {
+        throw error;
+    }
+};
 
 
 module.exports = {
@@ -78,4 +100,5 @@ module.exports = {
   createUser,
   createActivity,
   createRoutine,
+  updateActivity,
 }

@@ -20,6 +20,45 @@ async function getAllActivities() {
     return rows;
 };
 
+async function getRoutineById(routineId) {
+    try {
+        const { rows: [routine] } = await client.query(`
+            SELECT *
+            FROM routines
+            WHERE id=$1;
+            `, [routineId]);
+
+            if(!routine) {
+                throw {
+                    name: "RoutineNotFoundError",
+                    message: "Could not find a routine with that routineId"
+                }
+            };
+
+            const { rows: [activities] } = await client.query(`
+                SELECT *
+                FROM activities
+                JOIN routine_activities ON activities.id=routine_activities."activityId"
+                WHERE routine_activities."routineId"=$1;
+                `, [routineId]);
+
+            const { rows: [creator]} = await client.query(`
+                SELECT id, username, name
+                FROM users
+                WHERE id=$1;
+                `, [routine.creatorId]);
+
+            routine.activities = activities;
+            routine.creator = creator;
+
+            delete routine.creatorId;
+
+            return routine;
+    } catch(error) {
+        throw error;
+    }
+};
+
 async function getAllRoutines() {
     const { rows } = await client.query(`
         SELECT id, name
@@ -28,13 +67,6 @@ async function getAllRoutines() {
 
     return rows;
 };
-
-// async function getPublicRoutines() {
-//     const { rows } = await client.query(`
-//       SELECT id, name
-//       FROM routines;
-//     `)
-// }
 
 async function createUser({ username, password, name}) {
     try {
@@ -131,22 +163,21 @@ async function createRoutineActivity(routineId, activityId) {
   } catch (error) {
     throw error;
   }
-}
+};
 
 async function addActivitytoRoutine(routineId, activityList){
   try {
-    const createRoutineActivityPromises = activityList.map(activity=> createRoutineActivity(routineId, activity.id)
+    const createRoutineActivityPromises = activityList.map(
+        activity => createRoutineActivity(routineId, activity.id)
     );
 
     await Promise.all(createRoutineActivityPromises)
 
     return await getRoutineById(routineId);
   } catch (error) {
-
+    throw error;
   }
-}
-
-
+};
 
 module.exports = {
   client,
@@ -158,4 +189,6 @@ module.exports = {
   createRoutine,
   updateActivity,
   updateRoutine,
+  addActivitytoRoutine,
+  getRoutineById,
 }

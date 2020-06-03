@@ -6,7 +6,8 @@ const { client,
   createActivity,
   createRoutine,
   updateActivity,
-  updateRoutine
+  updateRoutine,
+  getRoutineById,
 } = require('./index');
 
 async function testDB() {
@@ -27,7 +28,10 @@ async function testDB() {
      name: 'cardio',
      goal: '30 mins',
     });
-    console.log('updateRoutineResult', updateRoutineResult)
+    console.log('updateRoutineResult', updateRoutineResult);
+
+    const requestedRoutine = await getRoutineById(1);
+    console.log('getRoutineById>>>>>>>>>>:', requestedRoutine)
 
     console.log('finished testing DB');
   } catch (error) {

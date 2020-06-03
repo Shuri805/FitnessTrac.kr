@@ -139,6 +139,42 @@ async function getAllRoutinesByUser(userId) {
     }
 };
 
+async function getPublicRoutinesByUser(userId) {
+    try {  
+        const { rows : routineIds } = await client.query(`
+            SELECT id
+            FROM routines
+            WHERE "creatorId"=${userId}
+            AND public=$1;`, ["true"]);
+
+        const routines = await Promise.all(routineIds.map(
+            routine => getRoutineById( routine.id )
+        ));
+        
+        return routines;
+    } catch (error) {
+        throw error;
+    }
+};
+
+async function getPublicRoutinesByActivity(activityId) {
+    try {
+        const { rows: routineIds } = await client.query(`
+            SELECT routines.id
+            FROM routines
+            JOIN routine_activities ON routines.id=routine_activities."routineId"
+            JOIN activities ON activities.id=routine_activities."activityId"
+            WHERE activities.name=$1
+            AND public=$2;`, [activityId, "true"]);
+
+            return await Promise.all(routineIds.map(
+                routine => getRoutineById(routine.id)
+            ));
+    } catch(error) {
+        throw error;
+    }
+};
+
 async function updateActivity(id, fields = {}) {
   const setString = Object.keys(fields).map(
       (key, index) => `"${key}"=$${ index + 1 }`
@@ -225,4 +261,6 @@ module.exports = {
   getRoutineById,
   getPublicRoutines,
   getAllRoutinesByUser,
+  getPublicRoutinesByUser,
+  getPublicRoutinesByActivity,
 }

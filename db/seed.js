@@ -10,6 +10,8 @@ const { client,
   getRoutineById,
   getPublicRoutines,
   getAllRoutinesByUser,
+  getPublicRoutinesByUser,
+  getPublicRoutinesByActivity,
 } = require('./index');
 
 async function testDB() {
@@ -36,10 +38,16 @@ async function testDB() {
     // console.log('getRoutineById>>>>>>>>>>:', requestedRoutine);
 
     const publicRoutines = await getPublicRoutines();
-    console.log('getPublicRoutines>>>>>>>>>:', publicRoutines);
+    // console.log('getPublicRoutines>>>>>>>>>:', publicRoutines);
 
     const userRoutines = await getAllRoutinesByUser(1);
-    console.log('getAllRoutinesByUser>>>>>:', userRoutines)
+    // console.log('getAllRoutinesByUser>>>>>:', userRoutines);
+
+    const publicUserRoutines = await getPublicRoutinesByUser(1);
+    // console.log('getPublicRoutinesByUser>>>>:', publicUserRoutines);
+
+    const publicRoutineActivity = await getPublicRoutinesByActivity(1);
+    console.log('getPublicRoutineByActivity>>>>>:', publicRoutineActivity);
 
     console.log('finished testing DB');
   } catch (error) {
@@ -158,6 +166,16 @@ async function createInitialActivity() {
       name: "exercise",
       description: "jogging"
     });
+    
+    await createActivity({
+      name: "swim",
+      description: "swim in the pool"
+    });
+    
+    await createActivity({
+      name: "volleyball",
+      description: "play volleyball"
+    });
 
     console.log("Finished creating activity!");
 
@@ -179,6 +197,29 @@ async function createInitialRoutine() {
       name: "leg day",
       goal: "30 reps",
     });
+    
+    await createRoutine({
+      creatorId: albert.id,
+      public: "false",
+      name: "back day",
+      goal: "20 reps",
+    });
+    
+    await createRoutine({
+      creatorId: sandra.id,
+      public: "false",
+      name: "arm day",
+      goal: "100 reps",
+    });
+    
+    await createRoutine({
+      creatorId: glamgal.id,
+      public: "true",
+      name: "chest day",
+      goal: "10 reps",
+    });
+
+
 
     console.log("Finished creating routine!");
 

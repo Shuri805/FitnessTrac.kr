@@ -68,6 +68,20 @@ async function getAllRoutines() {
     return rows;
 };
 
+async function getPublicRoutines() {
+    try {
+        const { rows } = await client.query(`
+            SELECT *
+            FROM routines
+            WHERE public=$1;
+            `, ["true"]);
+
+        return rows;    
+    } catch(error) {
+        throw error;
+    }
+};
+
 async function createUser({ username, password, name}) {
     try {
         const result = await client.query(`
@@ -105,6 +119,24 @@ async function createRoutine({ creatorId, public, name, goal }) {
   } catch (error) {
       throw error;
   }
+};
+
+async function getAllRoutinesByUser(userId) {
+    try {
+        const { rows: routineIds } = await client.query(`
+            SELECT id
+            FROM routines
+            WHERE "creatorId"=${userId};
+            `);
+
+        const routines = await Promise.all(routineIds.map(
+            routine => getRoutineById( routine.id )
+        ));
+
+        return routines;
+    } catch(error) {
+        throw error;
+    }
 };
 
 async function updateActivity(id, fields = {}) {
@@ -191,4 +223,6 @@ module.exports = {
   updateRoutine,
   addActivitytoRoutine,
   getRoutineById,
+  getPublicRoutines,
+  getAllRoutinesByUser,
 }

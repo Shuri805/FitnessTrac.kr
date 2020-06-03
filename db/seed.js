@@ -8,30 +8,38 @@ const { client,
   updateActivity,
   updateRoutine,
   getRoutineById,
+  getPublicRoutines,
+  getAllRoutinesByUser,
 } = require('./index');
 
 async function testDB() {
   try {
     const users = await getAllUsers();
-    console.log('getAllUsers:', users);
+    // console.log('getAllUsers:', users);
 
     const [activity] = await getAllActivities();
     const updateActivityResult = await updateActivity(activity.id, {
       name: 'Biking',
       description: 'Ride a bike'
     });
-    console.log('updateActivityResult:', updateActivityResult);
+    // console.log('updateActivityResult:', updateActivityResult);
 
     const [routine] = await getAllRoutines();
     const updateRoutineResult = await updateRoutine(routine.id, {
-     public: false,
+     public: true,
      name: 'cardio',
      goal: '30 mins',
     });
-    console.log('updateRoutineResult', updateRoutineResult);
+    // console.log('updateRoutineResult', updateRoutineResult);
 
     const requestedRoutine = await getRoutineById(1);
-    console.log('getRoutineById>>>>>>>>>>:', requestedRoutine)
+    // console.log('getRoutineById>>>>>>>>>>:', requestedRoutine);
+
+    const publicRoutines = await getPublicRoutines();
+    console.log('getPublicRoutines>>>>>>>>>:', publicRoutines);
+
+    const userRoutines = await getAllRoutinesByUser(1);
+    console.log('getAllRoutinesByUser>>>>>:', userRoutines)
 
     console.log('finished testing DB');
   } catch (error) {

@@ -14,6 +14,7 @@ const { client,
   getPublicRoutinesByActivity,
   updateRoutineActivity,
   createRoutineActivity,
+  destroyRoutineActivity,
 } = require('./index');
 
 async function testDB() {
@@ -53,9 +54,12 @@ async function testDB() {
 
     const newRoutineActivity = await updateRoutineActivity(1, {
       duration: 15,
-      count: 10, 
+      count: 10,
     });
-    console.log('updateRoutineActivity>>>>', newRoutineActivity);
+    // console.log('updateRoutineActivity>>>>', newRoutineActivity);
+
+    // const removedRoutineActivity = await destroyRoutineActivity(1);
+    // console.log('destroyRoutineActivity>>>', removedRoutineActivity);
 
     console.log('finished testing DB');
   } catch (error) {

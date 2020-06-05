@@ -274,6 +274,18 @@ async function addActivitytoRoutine(routineId, activityList){
   }
 };
 
+async function destroyRoutineActivity(id){
+  try {
+    await client.query(`
+    DELETE FROM routine_activities
+    WHERE id = $1;`, [id])
+    return `'deleted routine activity ${id}'`;
+
+  } catch (error) {
+    console.log('error deleting routine activity')
+    throw error;
+  }
+}
 
 module.exports = {
   client,
@@ -293,4 +305,5 @@ module.exports = {
   getPublicRoutinesByActivity,
   updateRoutineActivity,
   createRoutineActivity,
+  destroyRoutineActivity,
 }

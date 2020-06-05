@@ -12,6 +12,7 @@ const { client,
   getAllRoutinesByUser,
   getPublicRoutinesByUser,
   getPublicRoutinesByActivity,
+  updateRoutineActivity,
 } = require('./index');
 
 async function testDB() {
@@ -47,7 +48,10 @@ async function testDB() {
     // console.log('getPublicRoutinesByUser>>>>:', publicUserRoutines);
 
     const publicRoutineActivity = await getPublicRoutinesByActivity(1);
-    console.log('getPublicRoutineByActivity>>>>>:', publicRoutineActivity);
+    // console.log('getPublicRoutineByActivity>>>>>:', publicRoutineActivity);
+
+    const newRoutineActivity = await updateRoutineActivity({id: 1, count: 10, duration: '10 mins'});
+    console.log('updateRoutineActivity>>>>',updateRoutineActivity);
 
     console.log('finished testing DB');
   } catch (error) {
@@ -166,12 +170,12 @@ async function createInitialActivity() {
       name: "exercise",
       description: "jogging"
     });
-    
+
     await createActivity({
       name: "swim",
       description: "swim in the pool"
     });
-    
+
     await createActivity({
       name: "volleyball",
       description: "play volleyball"
@@ -197,21 +201,21 @@ async function createInitialRoutine() {
       name: "leg day",
       goal: "30 reps",
     });
-    
+
     await createRoutine({
       creatorId: albert.id,
       public: "false",
       name: "back day",
       goal: "20 reps",
     });
-    
+
     await createRoutine({
       creatorId: sandra.id,
       public: "false",
       name: "arm day",
       goal: "100 reps",
     });
-    
+
     await createRoutine({
       creatorId: glamgal.id,
       public: "true",

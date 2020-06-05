@@ -11,6 +11,21 @@ async function getAllUsers() {
     return rows;
 };
 
+async function getUserByUsername(username) {
+  try {
+    const { rows: [user]} = await client.query(`
+    SELECT *
+    FROM users
+    WHERE username=$1
+    `, [username]);
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 async function getAllActivities() {
     const { rows } = await client.query(`
         SELECT id, name
@@ -290,6 +305,7 @@ async function destroyRoutineActivity(id){
 module.exports = {
   client,
   getAllUsers,
+  getUserByUsername,
   getAllActivities,
   getAllRoutines,
   createUser,

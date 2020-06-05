@@ -121,6 +121,20 @@ async function createRoutine({ creatorId, public, name, goal }) {
   }
 };
 
+async function createRoutineActivity({routineId, activityId, duration, count}) {
+    try {
+      const result = await client.query(`
+      INSERT INTO routine_activities("routineId", "activityId", duration, count)
+      VALUES ($1, $2, $3, $4)
+      ON CONFLICT ("routineId", "activityId") DO NOTHING;
+      `, [routineId, activityId, duration, count]);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
 async function getAllRoutinesByUser(userId) {
     try {
         const { rows: routineIds } = await client.query(`
@@ -223,7 +237,7 @@ async function updateRoutine(id, fields = {}) {
 
 async function updateRoutineActivity( id, fields = {}) {
   const setString = Object.keys(fields).map(
-    (key, index) => `"${ key }"=$${ index +1 }`
+    (key, index) => `${ key }=$${ index +1 }`
   ).join(', ');
 
   if(setString.length === 0) {
@@ -234,27 +248,17 @@ async function updateRoutineActivity( id, fields = {}) {
     const{rows: [routine_activity]} = await client.query(`
     UPDATE routine_activities
     SET ${setString}
-    WHERE id=${id}
+    WHERE "routineId"=${id}
     RETURNING *;
     `, Object.values(fields));
+
+    // console.log('routine-activity>>>:', routine_activity);
 
     return routine_activity;
   } catch (error) {
     throw error;
   }
 }
-
-async function createRoutineActivity(routineId, activityId) {
-  try {
-    await client.query(`
-    INSERT INTO routine_activities("routineId", "activityId")
-    VALUES ($1, $2)
-    ON CONFLICT ("routineId", "activityId") DO NOTHING;
-    `,[ routineId, activityId]);
-  } catch (error) {
-    throw error;
-  }
-};
 
 async function addActivitytoRoutine(routineId, activityList){
   try {
@@ -288,4 +292,5 @@ module.exports = {
   getPublicRoutinesByUser,
   getPublicRoutinesByActivity,
   updateRoutineActivity,
+  createRoutineActivity,
 }

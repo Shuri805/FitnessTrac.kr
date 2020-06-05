@@ -13,6 +13,7 @@ const { client,
   getPublicRoutinesByUser,
   getPublicRoutinesByActivity,
   updateRoutineActivity,
+  createRoutineActivity,
 } = require('./index');
 
 async function testDB() {
@@ -50,8 +51,11 @@ async function testDB() {
     const publicRoutineActivity = await getPublicRoutinesByActivity(1);
     // console.log('getPublicRoutineByActivity>>>>>:', publicRoutineActivity);
 
-    const newRoutineActivity = await updateRoutineActivity({id: 1, count: 10, duration: '10 mins'});
-    console.log('updateRoutineActivity>>>>',updateRoutineActivity);
+    const newRoutineActivity = await updateRoutineActivity(1, {
+      duration: 15,
+      count: 10, 
+    });
+    console.log('updateRoutineActivity>>>>', newRoutineActivity);
 
     console.log('finished testing DB');
   } catch (error) {
@@ -130,6 +134,7 @@ async function rebuildDB() {
     await createInitialUsers();
     await createInitialActivity();
     await createInitialRoutine();
+    await createInitialRoutineActivity();
   } catch (error) {
     console.error(error);
   }
@@ -223,15 +228,30 @@ async function createInitialRoutine() {
       goal: "10 reps",
     });
 
-
-
     console.log("Finished creating routine!");
 
   } catch (error) {
     console.error("Error creating routine!")
     throw error;
   }
-}
+};
+
+async function createInitialRoutineActivity() {
+  try {
+    console.log('Creating Routine Activities');
+
+    await createRoutineActivity({
+      routineId: 1,
+      activityId: 1,
+      duration: 10,
+      count: 100,
+    });
+
+    console.log('Finished adding to Routine');
+  } catch(error) {
+    throw error;
+  }
+};
 
 rebuildDB()
   .then(testDB)

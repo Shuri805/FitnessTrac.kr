@@ -59,8 +59,8 @@ async function testDB() {
     });
     // console.log('updateRoutineActivity>>>>', newRoutineActivity);
 
-    // const removedRoutineActivity = await destroyRoutineActivity(1);
-    // console.log('destroyRoutineActivity>>>', removedRoutineActivity);
+    const deleteRA = await destroyRoutineActivity(1);
+    // console.log('destroyRoutineActivity:', deleteRA)
 
     console.log('finished testing DB');
   } catch (error) {

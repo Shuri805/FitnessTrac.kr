@@ -136,6 +136,22 @@ async function createRoutine({ creatorId, public, name, goal }) {
   }
 };
 
+async function getUserByUsername(username) {
+    try {
+        const { rows: [user]} = await client.query(`
+            SELECT *
+            FROM users
+            WHERE username=$1;
+            `, [username]);
+
+        console.log(user);
+        return user;
+    } catch (error) {
+        console.error(error)
+        throw error;
+    }
+};
+
 async function createRoutineActivity({routineId, activityId, duration, count}) {
     try {
       const result = await client.query(`
@@ -289,17 +305,17 @@ async function addActivitytoRoutine(routineId, activityList){
   }
 };
 
-async function destroyRoutineActivity(id){
-  try {
-    await client.query(`
-    DELETE FROM routine_activities
-    WHERE id = $1;`, [id])
-    return `'deleted routine activity ${id}'`;
+async function destroyRoutineActivity(id) {
+    try {
+        await client.query(`
+            DELETE from routine_activities
+            WHERE id=$1;
+            `, [id]);
 
-  } catch (error) {
-    console.log('error deleting routine activity')
-    throw error;
-  }
+        return `DELETED ROUTINE NUMBER: ${id}`;
+    } catch(error) {
+        throw error;
+    }
 }
 
 module.exports = {
@@ -322,4 +338,5 @@ module.exports = {
   updateRoutineActivity,
   createRoutineActivity,
   destroyRoutineActivity,
+  getUserByUsername,
 }

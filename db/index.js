@@ -11,24 +11,9 @@ async function getAllUsers() {
     return rows;
 };
 
-async function getUserByUsername(username) {
-  try {
-    const { rows: [user]} = await client.query(`
-    SELECT *
-    FROM users
-    WHERE username=$1
-    `, [username]);
-
-    return user;
-  } catch (error) {
-    throw error;
-  }
-}
-
-
 async function getAllActivities() {
     const { rows } = await client.query(`
-        SELECT id, name
+        SELECT *
         FROM activities;
     `);
 
@@ -289,7 +274,27 @@ async function updateRoutineActivity( id, fields = {}) {
   } catch (error) {
     throw error;
   }
-}
+};
+
+async function getUserById(userId) {
+    try {
+      const { rows: [ user ] } = await client.query(`
+        SELECT id, username, name
+        FROM users
+        WHERE id=${ userId }
+      `);
+  
+      if (!user) {
+        return null
+      }
+  
+      user.routines = await getAllRoutinesByUser(userId);
+  
+      return user;
+    } catch (error) {
+      throw error;
+    }
+};
 
 async function addActivitytoRoutine(routineId, activityList){
   try {
@@ -338,5 +343,5 @@ module.exports = {
   updateRoutineActivity,
   createRoutineActivity,
   destroyRoutineActivity,
-  getUserByUsername,
+  getUserById,
 }

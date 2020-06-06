@@ -11,14 +11,14 @@ const morgan = require('morgan');
 server.use(morgan('dev'));
 
 server.use((req, res, next) => {
-    console.log("<____Body Logger START____>");
-    console.log(req.body);
-    console.log("<_____Body Logger END_____>");
-
-    next();
+  console.log("<____Body Logger START____>");
+  console.log(req.body);
+  console.log("<_____Body Logger END_____>");
+  
+  next();
 });
-server.use('/api', apiRouter);
 
+server.use('/api', apiRouter);
 server.use(function(error, req, res, next) {
   console.error(error);
   res.send(error);

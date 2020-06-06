@@ -16,6 +16,7 @@ const { client,
   updateRoutineActivity,
   createRoutineActivity,
   destroyRoutineActivity,
+  getUserById,
 } = require('./index');
 
 async function testDB() {

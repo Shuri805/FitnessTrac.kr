@@ -2,7 +2,13 @@ const express = require('express');
 const usersRouter = express.Router();
 const { getAllUsers, getUserByUsername, createUser } = require('../db');
 const jwt = require('jsonwebtoken');
-const {JWT_SECRET} = process.env;
+// const {JWT_SECRET} = process.env;
+
+usersRouter.use((req, res, next) => {
+    console.log("A request is being made to /users");
+  
+    next();
+  });
 
 usersRouter.post('/login', async (req, res, next) => {
     const { username, password } = req.body;
@@ -16,6 +22,13 @@ usersRouter.post('/login', async (req, res, next) => {
 
     try {
       const user = await getUserByUsername(username);
+
+      const token = jwt.sign({
+        id: user.id,
+        username
+      }, process.env.JWT_SECRET, {
+        expiresIn: '1w'
+      });
 
       if (user && user.password == password) {
         res.send({ message: "you're logged in!", token: token });
@@ -33,7 +46,7 @@ usersRouter.post('/login', async (req, res, next) => {
 
   usersRouter.post('/register', async (req, res, next) => {
     const { username, password, name } = req.body;
-    console.log(req.body);
+    console.log('userInfo:', req.body);
 
     try {
       const _user = await getUserByUsername(username);
@@ -69,10 +82,25 @@ usersRouter.post('/login', async (req, res, next) => {
 
   usersRouter.get('/', async (req, res) => {
       const users = await getAllUsers();
+      console.log(req);
 
     res.send({
       users
     });
   });
+
+//   usersRouter.get('/:username/routines', async (req, res, next) => {
+//     console.log('hello');
+//     console.log(req.params.username);
+//   try {
+//     const routines = await getPostsByTagName(req.params.tagName);
+//     res.send({posts});
+//   } catch ({ name, message }) {
+//     next({
+//       name: 'Error',
+//       messgage: 'ERROR'
+//     })
+//   }
+// });
 
   module.exports = usersRouter;

@@ -2,6 +2,7 @@ const express = require('express');
 const usersRouter = express.Router();
 const { getAllUsers, getUserByUsername, createUser } = require('../db');
 const jwt = require('jsonwebtoken');
+const {JWT_SECRET} = process.env;
 
 usersRouter.post('/login', async (req, res, next) => {
     const { username, password } = req.body;
@@ -32,6 +33,7 @@ usersRouter.post('/login', async (req, res, next) => {
 
   usersRouter.post('/register', async (req, res, next) => {
     const { username, password, name } = req.body;
+    console.log(req.body);
 
     try {
       const _user = await getUserByUsername(username);

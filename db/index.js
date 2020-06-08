@@ -59,9 +59,30 @@ async function getRoutineById(routineId) {
     }
 };
 
+async function getActivityById(activityId) {
+    try {
+        const { rows: [activity]} = await client.query(`
+            SELECT *
+            FROM activities
+            WHERE id=$1;
+            `, [activityId]);
+
+            if(!activity) {
+                throw {
+                    name: 'ActivityNotFoundError',
+                    description: 'Could not find activity with that activityId'
+                }
+            };
+
+            return activity;
+    } catch(error) {
+        throw error;
+    }
+};
+
 async function getAllRoutines() {
     const { rows } = await client.query(`
-        SELECT id, name
+        SELECT *
         FROM routines;
     `);
 
@@ -317,11 +338,24 @@ async function destroyRoutineActivity(id) {
             WHERE id=$1;
             `, [id]);
 
-        return `DELETED ROUTINE NUMBER: ${id}`;
+        return `DELETED ROUTINE_ACTIVITY NUMBER: ${id}`;
     } catch(error) {
         throw error;
     }
-}
+};
+
+async function destroyRoutine(id) {
+    try {
+        await client.query(`
+            DELETE FROM routines
+            WHERE id=$1;
+            `, [id]);
+
+        return `DELETED ROUTINE NUMBER: ${id}`
+    } catch(error) {
+        throw error;
+    }
+};
 
 module.exports = {
   client,
@@ -343,5 +377,7 @@ module.exports = {
   updateRoutineActivity,
   createRoutineActivity,
   destroyRoutineActivity,
+  destroyRoutine,
   getUserById,
+  getActivityById,
 }

@@ -1,6 +1,6 @@
 const express = require('express');
 const usersRouter = express.Router();
-const { getAllUsers, getUserByUsername, createUser } = require('../db');
+const { getAllUsers, getUserByUsername, createUser, getAllRoutinesByUser, getPublicRoutinesByUser } = require('../db');
 const jwt = require('jsonwebtoken');
 // const {JWT_SECRET} = process.env;
 
@@ -44,7 +44,7 @@ usersRouter.post('/login', async (req, res, next) => {
     }
   });
 
-  usersRouter.post('/register', async (req, res, next) => {
+usersRouter.post('/register', async (req, res, next) => {
     const { username, password, name } = req.body;
     console.log('userInfo:', req.body);
 
@@ -78,29 +78,36 @@ usersRouter.post('/login', async (req, res, next) => {
     } catch ({ name, message }) {
       next({ name, message })
     }
-  });
+});
 
-  usersRouter.get('/', async (req, res) => {
-      const users = await getAllUsers();
-      console.log(req);
+usersRouter.get('/', async (req, res) => {
+    const users = await getAllUsers();
 
     res.send({
       users
     });
-  });
+});
 
-//   usersRouter.get('/:username/routines', async (req, res, next) => {
-//     console.log('hello');
-//     console.log(req.params.username);
-//   try {
-//     const routines = await getPostsByTagName(req.params.tagName);
-//     res.send({posts});
-//   } catch ({ name, message }) {
-//     next({
-//       name: 'Error',
-//       messgage: 'ERROR'
-//     })
-//   }
-// });
+usersRouter.get('/:username', async(req, res) => {
 
-  module.exports = usersRouter;
+  const user = await getUserByUsername(req.params.username);
+
+  res.send({user});
+});  
+
+usersRouter.get('/:username/routines', async (req, res, next) => {
+
+    const user = await getUserByUsername(req.params.username);
+
+  try {
+    const publicRoutines = await getPublicRoutinesByUser(user.id);
+    res.send({publicRoutines});
+  } catch ({ name, message }) {
+    next({
+      name: 'Error',
+      messgage: 'ERROR'
+    })
+  }
+});
+
+module.exports = usersRouter;

@@ -17,6 +17,7 @@ const { client,
   createRoutineActivity,
   destroyRoutineActivity,
   getUserById,
+  getActivityById,
 } = require('./index');
 
 async function testDB() {
@@ -51,8 +52,8 @@ async function testDB() {
     const publicUserRoutines = await getPublicRoutinesByUser(1);
     // console.log('getPublicRoutinesByUser>>>>:', publicUserRoutines);
 
-    const publicRoutineActivity = await getPublicRoutinesByActivity(1);
-    // console.log('getPublicRoutineByActivity>>>>>:', publicRoutineActivity);
+    const publicRoutineActivity = await getPublicRoutinesByActivity(2);
+    console.log('getPublicRoutineByActivity>>>>>:', publicRoutineActivity);
 
     const newRoutineActivity = await updateRoutineActivity(1, {
       duration: 15,
@@ -61,7 +62,10 @@ async function testDB() {
     // console.log('updateRoutineActivity>>>>', newRoutineActivity);
 
     const deleteRA = await destroyRoutineActivity(1);
-    // console.log('destroyRoutineActivity:', deleteRA)
+    // console.log('destroyRoutineActivity:', deleteRA);
+
+    const gottenActivity = await getActivityById(1);
+    // console.log('getActivityById:', gottenActivity);
 
     console.log('finished testing DB');
   } catch (error) {
@@ -215,14 +219,14 @@ async function createInitialRoutine() {
 
     await createRoutine({
       creatorId: albert.id,
-      public: "false",
+      public: "true",
       name: "back day",
       goal: "20 reps",
     });
 
     await createRoutine({
       creatorId: sandra.id,
-      public: "false",
+      public: "true",
       name: "arm day",
       goal: "100 reps",
     });
